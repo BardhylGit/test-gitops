@@ -38,7 +38,8 @@ jobs:
           if [ -z "$(git tag)" ]; then
             echo "tag=0.0.0" >> $GITHUB_ENV
           else
-            tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+            # tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+            tag=$(git describe --abbrev=0)
             echo "tag=${tag//v/}" >> $GITHUB_ENV
           fi
       - name: Use last git tag
