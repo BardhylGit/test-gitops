@@ -33,7 +33,7 @@ jobs:
             echo "::set-output name=tag::0.0.0"
           else
             tag=$(git describe --tags $(git rev-list --tags --max-count=1))
-            echo "::set-output name=tag::$tag"
+            echo "::set-output name=tag::${tag//v/}"
           fi
       - name: Use last git tag
         run: echo "Last tag was ${{ steps.last_tag.outputs.tag }}"
