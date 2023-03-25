@@ -30,10 +30,10 @@ jobs:
         id: last_tag
         run: |
           if [ -z "$(git tag)" ]; then
-            echo "::set-output name=tag::0.0.0"
+            echo "tag=0.0.0" >> $GITHUB_ENV
           else
             tag=$(git describe --tags $(git rev-list --tags --max-count=1))
-            echo "::set-output name=tag::${tag//v/}"
+            echo "tag=${tag//v/}" >> $GITHUB_ENV
           fi
       - name: Use last git tag
-        run: echo "Last tag was ${{ steps.last_tag.outputs.tag }}"
+        run: echo "Last tag was ${{ env.tag }}"
