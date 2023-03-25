@@ -29,6 +29,7 @@ jobs:
       - name: Get last git tag
         id: last_tag
         run: |
+          echo "${{ secrets.GITHUB_TOKEN }}"
           if [ -z "$(git tag)" ]; then
             echo "tag=0.0.0" >> $GITHUB_ENV
           else
