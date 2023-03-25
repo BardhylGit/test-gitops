@@ -26,10 +26,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: main # replace with the branch you want to checkout
+          fetch-depth: 0 # fetch all history, including tags
+        
       - name: Get last git tag
         id: last_tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}"
+          git config --local user.email "bardhylbegolli@gmail.com"
+          git config --local user.name "BardhylGit"
           if [ -z "$(git tag)" ]; then
             echo "tag=0.0.0" >> $GITHUB_ENV
           else
