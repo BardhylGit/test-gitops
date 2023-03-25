@@ -46,3 +46,4 @@ jobs:
             echo "commit the tag: ${{ env.tag }} to feat-evironments"
           else
             echo "Last tag was ${{ env.tag }} return;"
+          fi
