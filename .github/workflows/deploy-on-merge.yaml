@@ -5,13 +5,13 @@
 name: deploy-on-merge
 
 on:
-  # push:
-  #   paths-ignore:
-  #     - '**.md'
-  #   branches:
-  #     - '*'
-  #   tags:
-  #     - 'v[0-9]+.[0-9]+.[0-9]+'
+  push:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - '*'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     types:
       - closed
@@ -42,8 +42,9 @@ jobs:
           fi
       - name: Use last git tag
         run: |
-          if [${{ env.tag }} !== "v0.0.0"]; then
-            echo "commit the tag: ${{ env.tag }} to feat-evironments"
+          if [[ "${{ env.tag }}" =~ ^v([0-9]+.[0-9]+.[0-9]+)$ ]]; then
+            echo "commit the tag: ${BASH_REMATCH[1]} to feat-evironments"
+            echo "IMAGE_VERSION=${BASH_REMATCH[1]}" >> $GITHUB_ENV
           else
             echo "Last tag was ${{ env.tag }} return;"
           fi
