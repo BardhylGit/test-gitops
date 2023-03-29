@@ -19,6 +19,9 @@ on:
   #     - 'main'
   workflow_dispatch:
 
+  env: 
+    BRANCH_NAME: main
+
 jobs:
   find-tag:
     # if: github.event.pull_request.merged == true
@@ -35,7 +38,7 @@ jobs:
         run: |
           tag=tag_not_correct
           # check if git tag result is not empty string
-          if [ -n "$(git tag)" ]; then
+          if [ -n "$(git tag --points-at ${{ env.BRANCH_NAME }})" ]; then
             
             # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
             tag=$(git describe --tags)
@@ -53,6 +56,8 @@ jobs:
             fi
             echo "tag found: $tag"
             echo "tag=$tag" >> $GITHUB_ENV
+          else
+            echo "not tags found on branch ${{ env.BRANCH_NAME }}"
           fi
     outputs:
       tag_version: ${{ env.tag }}
