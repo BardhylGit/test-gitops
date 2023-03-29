@@ -1,0 +1,30 @@
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: release
+
+on:
+release:
+  types: [published]
+  workflow_dispatch:
+
+env: 
+  BRANCH_NAME: main
+
+jobs:
+  find-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          # ref: ${{ env.BRANCH_NAME }} # replace with the branch you want to checkout
+          fetch-depth: 0 # fetch all history, including tags
+        
+      - name: Get last git tag
+        id: last_tag
+        run: |
+          echo tag is ${GITHUB_REF/refs\/tags\//}
+      
+  
