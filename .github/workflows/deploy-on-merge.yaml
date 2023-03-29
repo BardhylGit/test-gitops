@@ -52,7 +52,7 @@ jobs:
           if [[ "$tag" =~ $commitAheadRegex ]]; then
               echo "Tag: $tag, does not point to the latest commit."
           else 
-              if [[ "$tag" =~ $correctVersionRegx ]]; then
+              if [[ "$tag" =~ $correctVersionRegex ]]; then
                   echo "commit the tag: to ${BASH_REMATCH} feat-evironments"
               else
                   echo "Last tag was return"
