@@ -40,6 +40,7 @@ jobs:
             tag=$(git describe --abbrev=0)
             # substring first 'v' character from tag, v0.0.1 => 0.0.1
             echo "tag=${tag//v/}" >> $GITHUB_ENV
+            echo "tag found: $tag"
           fi
       
   use-tag:
@@ -49,6 +50,7 @@ jobs:
         run: |
           correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
           commitAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
+          echo "tag using: $tag"
           if [[ "$tag" =~ $commitAheadRegex ]]; then
               echo "Tag: $tag, does not point to the latest commit."
           else 
