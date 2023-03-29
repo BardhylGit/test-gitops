@@ -1,0 +1,70 @@
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: release
+
+on:
+  # push:
+  #   paths-ignore:
+  #     - '**.md'
+  #   branches:
+  #     - main
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
+  release:
+    types:
+      - released
+  workflow_dispatch:
+
+env: 
+  BRANCH_NAME: main
+
+jobs:
+  find-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          # ref: ${{ env.BRANCH_NAME }} # replace with the branch you want to checkout
+          fetch-depth: 0 # fetch all history, including tags
+        
+      - name: Get last git tag
+        id: last_tag
+        run: |
+          tag=tag_not_correct
+          # check if git tag result is not empty string
+          if [ -n "$(git tag --merged ${{ env.BRANCH_NAME }})" ]; then
+            
+            # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
+            tag=$(git describe --tags)
+            tag=${tag//v/}
+            correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
+            commitsAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
+            if [[ "$tag" =~ $commitsAheadRegex ]]; then
+              echo "Tag: $tag, does not point to the latest commit."
+              tag=tag_not_correct
+            else 
+              if ! [[ "$tag" =~ $correctVersionRegex ]]; then
+                 echo "tag version $tag is not in correct format"
+                tag=tag_not_correct
+              fi
+            fi
+          else
+            echo "not tags found on branch ${{ env.BRANCH_NAME }}"
+          fi
+          echo "tag found: $tag"
+          echo "tag=$tag" >> $GITHUB_ENV
+    outputs:
+      tag_version: ${{ env.tag }}
+      
+  use-tag:
+    needs: find-tag
+    if: needs.find-tag.outputs.tag_version != 'tag_not_correct'
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Use last git tag
+        run: |
+          image_version=${{ needs.find-tag.outputs.tag_version }}
+          echo "commit the tag:$image_version to  feat-evironments"
