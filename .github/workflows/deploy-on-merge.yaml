@@ -17,10 +17,12 @@ jobs:
       - name: Find latest tag
         id: find-latest-tag
         run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+    outputs:
+      tag_version: ${{ env.TAG }}
 
   use-tag:
     needs: find-tag
     runs-on: ubuntu-latest
     steps:
       - name: Use latest tag
-        run: echo "Latest tag is ${{ env.TAG }}"
+        run: echo "Latest tag is ${{ env.tag_version }}"
