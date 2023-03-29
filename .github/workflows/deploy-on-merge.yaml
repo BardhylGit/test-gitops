@@ -19,8 +19,8 @@ on:
   #     - 'main'
   workflow_dispatch:
 
-  env: 
-    BRANCH_NAME: main
+env: 
+  BRANCH_NAME: main
 
 jobs:
   find-tag:
