@@ -39,8 +39,8 @@ jobs:
             # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
             tag=$(git describe --tags)
             # substring first 'v' character from tag, v0.0.1 => 0.0.1
-            echo "tag=${tag//v/}" >> $GITHUB_ENV
             echo "tag found: $tag"
+            echo "TAG=${tag//v/}" >> $GITHUB_ENV
           fi
       
   use-tag:
@@ -51,11 +51,11 @@ jobs:
         run: |
           correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
           commitAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
-          echo "tag using: ${{ env.tag }}"
-          if [[ "${{ env.tag }}" =~ $commitAheadRegex ]]; then
-              echo "Tag: ${{ env.tag }}, does not point to the latest commit."
+          echo "tag using: ${{ env.TAG }}"
+          if [[ "${{ env.TAG }}" =~ $commitAheadRegex ]]; then
+              echo "Tag: ${{ env.TAG }}, does not point to the latest commit."
           else 
-              if [[ "${{ env.tag }}" =~ $correctVersionRegex ]]; then
+              if [[ "${{ env.TAG }}" =~ $correctVersionRegex ]]; then
                   echo "commit the tag: to ${BASH_REMATCH} feat-evironments"
               else
                   echo "Last tag was return"
