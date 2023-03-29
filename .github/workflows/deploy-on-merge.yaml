@@ -38,11 +38,12 @@ jobs:
           if [ -n "$(git tag)" ]; then
             
             # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
-            tag=$(git describe --tags)
-            correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
-            commitsAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
+            tag=$(git describe --tags)//v/
+            correctVersionRegex=^v[0-9]+\.[0-9]+\.[0-9]+$ 
+            commitsAheadRegex=^v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
             if [[ "$tag" =~ $commitsAheadRegex ]]; then
               echo "Tag: $tag, does not point to the latest commit."
+              tag=tag_not_correct
             else 
               if [[ "$tag" =~ $correctVersionRegex ]]; then
                 # substring first 'v' character from tag, v0.0.1 => 0.0.1
@@ -50,6 +51,7 @@ jobs:
                 echo "commit the tag: to ${BASH_REMATCH} feat-evironments"
               else
                 echo "tag version $tag is not in correct format"
+                tag=tag_not_correct
               fi
             fi
             echo "tag found: $tag"
