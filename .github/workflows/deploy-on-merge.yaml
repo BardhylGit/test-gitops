@@ -44,6 +44,7 @@ jobs:
           fi
       
   use-tag:
+    needs: find-tag
     runs-on: ubuntu-latest
     steps:
       - name: Use last git tag
