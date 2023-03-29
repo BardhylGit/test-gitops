@@ -42,8 +42,6 @@ jobs:
             echo "tag=${tag//v/}" >> $GITHUB_ENV
             echo "tag found: $tag"
           fi
-    outputs: 
-      image_version: ${{ tag }}
       
   use-tag:
     runs-on: ubuntu-latest
