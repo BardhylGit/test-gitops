@@ -26,4 +26,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Use latest tag
-        run: echo "Latest tag is ${{ needs.find-tag.outputs.tag_version }}"
+        run: echo "Latest tag is ${{ needs.find-tag.outputs.tag_version }}, and envtag is ${{ env.TAG }}"
