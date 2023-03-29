@@ -20,7 +20,7 @@ on:
   # workflow_dispatch:
 
 jobs:
-  deploy-release:
+  find-tag:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -34,17 +34,27 @@ jobs:
         id: last_tag
         run: |
           if [ -z "$(git tag)" ]; then
-            echo "tag=v0.0.0" >> $GITHUB_ENV
+            echo "tag=0" >> $GITHUB_ENV
           else
             # tag=$(git describe --tags $(git rev-list --tags --max-count=1))
             tag=$(git describe --abbrev=0)
+            # substring first 'v' character from tag, v0.0.1 => 0.0.1
             echo "tag=${tag//v/}" >> $GITHUB_ENV
           fi
+      
+  use-tag:
+    runs-on: ubuntu-latest
+    steps:
       - name: Use last git tag
         run: |
-          if [[ "${{ env.tag }}" =~ ^v([0-9]+.[0-9]+.[0-9]+)$ ]]; then
-            echo "commit the tag: ${BASH_REMATCH[1]} to feat-evironments"
-            echo "IMAGE_VERSION=${BASH_REMATCH[1]}" >> $GITHUB_ENV
-          else
-            echo "Last tag was ${{ env.tag }} return;"
+          correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
+          commitAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
+          if [[ "$tag" =~ $commitAheadRegex ]]; then
+              echo "Tag: $tag, does not point to the latest commit."
+          else 
+              if [[ "$tag" =~ $correctVersionRegx ]]; then
+                  echo "commit the tag: to ${BASH_REMATCH} feat-evironments"
+              else
+                  echo "Last tag was return"
+              fi
           fi
