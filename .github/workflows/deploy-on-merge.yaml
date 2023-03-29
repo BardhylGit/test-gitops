@@ -3,28 +3,28 @@
 # You can also reference a tag or branch, but the action may change without warning.
 
 name: deploy-on-merge
-env: 
-  BRANCH_NAME: main
+
 on:
-  push:
-    paths-ignore:
-      - '**.md'
-    branches:
-      - main
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-  # pull_request:
-  #   types:
-  #     - closed
+  # push:
+  #   paths-ignore:
+  #     - '**.md'
   #   branches:
-  #     - 'main'
+  #     - main
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - 'main'
   workflow_dispatch:
 
-
+env: 
+  BRANCH_NAME: main
 
 jobs:
   find-tag:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
         run: |
           tag=tag_not_correct
           # check if git tag result is not empty string
-          if [ -n "$(git tag --points-at ${{ env.BRANCH_NAME }})" ]; then
+          if [ -n "$(git tag --merged ${{ env.BRANCH_NAME }})" ]; then
             
             # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
             tag=$(git describe --tags)
