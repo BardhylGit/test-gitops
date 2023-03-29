@@ -16,7 +16,7 @@ on:
     types:
       - closed
     branches:
-      - 'main'
+      - main
   workflow_dispatch:
 
 env: 
