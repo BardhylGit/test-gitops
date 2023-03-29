@@ -54,11 +54,11 @@ jobs:
                 tag=tag_not_correct
               fi
             fi
-            echo "tag found: $tag"
-            echo "tag=$tag" >> $GITHUB_ENV
           else
             echo "not tags found on branch ${{ env.BRANCH_NAME }}"
           fi
+          echo "tag found: $tag"
+          echo "tag=$tag" >> $GITHUB_ENV
     outputs:
       tag_version: ${{ env.tag }}
       
