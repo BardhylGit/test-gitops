@@ -22,18 +22,31 @@ jobs:
         id: next_prerelease
         run: |
           prereleaseIndex=$(git tag --sort=-version:refname | grep -E '^pre-release.([0-9]+)' | head -n1 | awk -F'.' '{print $2+1}')
+          LAST_RELEASE_COMMIT_ID=$(git rev-parse HEAD)
+          if [ -n "$(git tag | grep 'release')"]; then
+            # echo "release exists, get the commit hash for tag release"
+            LAST_RELEASE_COMMIT_ID=$(git rev-list --max-count=1 --pretty=format:%H release | awk 'NR==2')
+          fi
+          echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_ENV
           if [ -z $prereleaseIndex]; then
             prereleaseIndex=1
           fi
           echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_ENV
       - name: Add pre-release tag
         run: |
-          prereleaseTag=pre-release.${{ env.NEXT_PRERELEASE_INDEX }}
           git config --global user.email "bardhylbegolli@gmail.com"
           git config --global user.name "BardhylGit"
-          git tag -a $prereleaseTag -m "Pre-release number ${{ env.NEXT_PRERELEASE_INDEX }}"
+
+          prereleaseTag=pre-release.${{ env.NEXT_PRERELEASE_INDEX }}
+
+          # shto tag pre-release tek comit ku ishte tag release, dhe shtoje ne origine
+          git tag -a $prereleaseTag -m "Pre-release number ${{ env.NEXT_PRERELEASE_INDEX }}" ${{ env.LAST_RELEASE_COMMIT_ID }}
           git push origin $prereleaseTag 
+
+          # fshije ne lokalisht dhe ne origjine tagun release
           git tag -d release
           git push --delete origin release
+
+          # shto tagun release ne HEAD dhe push ne origjine
           git tag release HEAD
           git push origin --tags
