@@ -22,8 +22,8 @@ jobs:
           if git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*" >/dev/null 2>&1; then
             echo "Main branch contains a tag that   matches the pattern.";
             # lastVersionTag do jete komiti qe ka tag v0.0.1 psh
-            lastVersionTag=git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*"
-            lastVersionCommit=git rev-list --max-count=1 --tags $lastVersionTag
+            lastVersionTag=$(git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*")
+            lastVersionCommit=$(git rev-list --max-count=1 --tags $lastVersionTag)
             echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_ENV
           fi
           echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_ENV
