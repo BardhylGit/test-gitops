@@ -1,0 +1,27 @@
+name: Pre-release Tagging Workflow
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  prerelease_tagging:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Determine next pre-release index
+        id: next_prerelease
+        run: echo "::set-output name=next_prerelease_index::$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$' | head -n1 | awk -F'.' '{print $4+1}')"
+      - name: Add pre-release tag
+        env:
+          NEXT_PRERELEASE_INDEX: ${{ steps.next_prerelease.outputs.next_prerelease_index }}
+        run: |
+          git tag -a pre-release:v0.0.${{ env.NEXT_PRERELEASE_INDEX }} -m "Pre-release tag for v0.0.${{ env.NEXT_PRERELEASE_INDEX }}"
+          git push origin pre-release:v0.0.${{ env.NEXT_PRERELEASE_INDEX }} 
+          git tag -d release
+          git tag release HEAD
+          git push origin --tags
