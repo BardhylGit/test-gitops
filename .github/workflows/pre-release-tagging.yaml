@@ -25,7 +25,7 @@ jobs:
           LAST_RELEASE_COMMIT_ID=$(git rev-parse HEAD)
           if [ -n "$(git tag | grep 'release')"]; then
             # echo "release exists, get the commit hash for tag release"
-            LAST_RELEASE_COMMIT_ID=$(git rev-list --max-count=1 --pretty=format:%H release | awk 'NR==2')
+            LAST_RELEASE_COMMIT_ID=$(git rev-list --max-count=1 --tags release)
           fi
           echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_ENV
           if [ -z $prereleaseIndex]; then
