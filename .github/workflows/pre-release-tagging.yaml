@@ -34,5 +34,6 @@ jobs:
           git tag -a $prereleaseTag -m "Pre-release number ${{ env.NEXT_PRERELEASE_INDEX }}"
           git push origin $prereleaseTag 
           git tag -d release
+          git push origin --tags
           git tag release HEAD
           git push origin --tags
