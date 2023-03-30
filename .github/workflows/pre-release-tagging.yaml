@@ -23,12 +23,15 @@ jobs:
         run: |
           prereleaseIndex=$(git tag --sort=-version:refname | grep -E '^pre-release.([0-9]+)' | head -n1 | awk -F'.' '{print $2+1}')
           LAST_RELEASE_COMMIT_ID=$(git rev-parse HEAD)
+          releaseTagExists=0
           if [ -n "$(git tag | grep 'release')"]; then
             # echo "release exists, get the commit hash for tag release"
             LAST_RELEASE_COMMIT_ID=$(git rev-list --max-count=1 --tags release)
+            releaseTagExists=1
           fi
           echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_ENV
-          if [ -z $prereleaseIndex]; then
+          echo "RELEASE_TAG_EXISTS=$releaseTagExists" >> $GITHUB_ENV
+          if [ -z "$prereleaseIndex" ]; then
             prereleaseIndex=1
           fi
           echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_ENV
@@ -44,8 +47,10 @@ jobs:
           git push origin $prereleaseTag 
 
           # fshije ne lokalisht dhe ne origjine tagun release
-          git tag -d release
-          git push --delete origin release
+          if [ ${{ env.RELEASE_TAG_EXISTS }} = 1]; then
+            git tag -d release
+            git push --delete origin release
+          fi
 
           # shto tagun release ne HEAD dhe push ne origjine
           git tag release HEAD
