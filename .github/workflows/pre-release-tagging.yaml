@@ -24,8 +24,8 @@ jobs:
           prereleaseIndex=$(git tag --sort=-version:refname | grep -E '^pre-release.([0-9]+)' | head -n1 | awk -F'.' '{print $2+1}')
           LAST_RELEASE_COMMIT_ID=$(git rev-parse HEAD)
           releaseTagExists=0
-          if [ -n "$(git tag | grep 'release')"]; then
-            # echo "release exists, get the commit hash for tag release"
+          if [ -n "$(git tag | grep 'release')" ]; then
+            echo "release exists, get the commit hash for tag release"
             LAST_RELEASE_COMMIT_ID=$(git rev-list --max-count=1 --tags release)
             releaseTagExists=1
           fi
