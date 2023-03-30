@@ -3,22 +3,12 @@
 # You can also reference a tag or branch, but the action may change without warning.
 
 name: deploy-on-merge
-
 on:
   push:
-    paths-ignore:
-      - '**.md'
     branches:
-      - main
+      - 'main'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
-  # pull_request:
-  #   types:
-  #     - closed
-  #   branches:
-  #     - main
-  workflow_dispatch:
-
 env: 
   BRANCH_NAME: main
 
@@ -41,12 +31,12 @@ jobs:
           if [ -n "$(git tag --merged ${{ env.BRANCH_NAME }})" ]; then
             
             # tag = v0.0.1 kur tag eshte ne komitin e fundit ose v0.0.1-5-g34h34j kur kemi komite te tjera siper tagut
-            tag=$(git describe --tags)
+            tag=$(git describe --tags --abbrev=0)
             tag=${tag//v/}
             correctVersionRegex=^[0-9]+\.[0-9]+\.[0-9]+$ 
             commitsAheadRegex=^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[[:alnum:]]+$
             if [[ "$tag" =~ $commitsAheadRegex ]]; then
-              echo "Tag: $tag, does not point to the latest commit."
+              echo "Tag: $tag, does not point to the latest commit. TODO: FIND the last release tag on this branch, create new tag pre-release:v5 v5 is next pre-release version. create new tag release on the last commit."
               tag=tag_not_correct
             else 
               if ! [[ "$tag" =~ $correctVersionRegex ]]; then
