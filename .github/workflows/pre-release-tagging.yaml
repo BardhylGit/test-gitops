@@ -27,10 +27,9 @@ jobs:
             echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_ENV
           fi
           echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_ENV
-      outputs:
+    outputs:
         LAST_VERSION_COMMIT:  ${{ env.LAST_VERSION_COMMIT }}
         LAST_VERSION_TAG: ${{ env.LAST_VERSION_TAG }}
-
   prerelease_tagging:
     needs:
       - find_comit_with_version
