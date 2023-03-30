@@ -4,12 +4,38 @@ on:
   pull_request:
     types: [closed]
     branches:
+  
       - main
+env:
+  BRANCH_NAME: 'main'
 
 jobs:
-  prerelease_tagging:
+  find_comit_with_version:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    steps:
+      - name: Get latest version tag
+        id: last_version
+        run: |
+          lastVersionCommit=0
+          # check if git tag result is not empty string
+          if git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*" >/dev/null 2>&1; then
+            echo "Main branch contains a tag that   matches the pattern.";
+            # lastVersionTag do jete komiti qe ka tag v0.0.1 psh
+            lastVersionTag=git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*"
+            lastVersionCommit=git rev-list --max-count=1 --tags $lastVersionTag
+            echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_ENV
+          fi
+          echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_ENV
+      outputs:
+        LAST_VERSION_COMMIT:  ${{ env.LAST_VERSION_COMMIT }}
+        LAST_VERSION_TAG: ${{ env.LAST_VERSION_TAG }}
+
+  prerelease_tagging:
+    needs:
+      - find_comit_with_version
+    if: needs.find_comit_with_version.outputs.LAST_VERSION_COMMIT != 0
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -53,5 +79,5 @@ jobs:
           fi
 
           # shto tagun release ne HEAD dhe push ne origjine
-          git tag release HEAD
+          git tag release ${{ needs.find_comit_with_version.outputs.LAST_VERSION_COMMIT }}
           git push origin --tags
