@@ -22,12 +22,12 @@ jobs:
           if [ -z $prereleaseIndex]; then
             prereleaseIndex=1
           fi
-          echo "::set-output name=next_prerelease_index::$prereleaseIndex"
+          echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_ENV
       - name: Add pre-release tag
-        env:
-          NEXT_PRERELEASE_INDEX: ${{ steps.next_prerelease.outputs.next_prerelease_index }}
         run: |
           prereleaseTag=pre-release.${{ env.NEXT_PRERELEASE_INDEX }}
+          git config --global user.email "bardhylbegolli@gmail.com"
+          git config --global user.name "BardhylGit"
           git tag -a $prereleaseTag -m "Pre-release number ${{ env.NEXT_PRERELEASE_INDEX }}"
           git push origin $prereleaseTag 
           git tag -d release
