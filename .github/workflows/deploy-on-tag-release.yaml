@@ -36,10 +36,12 @@ jobs:
                     tagVersion=$(git tag --list "v[0-9]*.[0-9]*.[0-9]*" --points-at $LAST_RELEASE_COMMIT_ID | tr ' ' '\n' | sort -rV | head -n1)
                   fi
                   echo "$tagVersion"
-                  echo "tagVersion=${tagVersion//v/}" >> $GITHUB_OUTPUT
+                  echo "tagVersion=${tagVersion//v/}" >> $GITHUB_ENV
+          outputs:
+            tagVersion: ${{ env.tagVersion }}
     use-tag:
         needs: find-tag
-        if: needs.find-tag.outputs.tagVersion != 0
+        if: ${{ needs.find-tag.outputs.tagVersion }} != 0
         runs-on: ubuntu-latest
         steps:
             - name: Use last git tag
