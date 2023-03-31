@@ -1,0 +1,90 @@
+name: Pre-release Tagging Workflow
+
+# kjo do na siguroje qe vetem 1 workflow e ketij tipi "tagging" do ekzekutohet ne nje kohe.
+# workflow-t e reja qe kane kete emertim "tagging" do vendosen ne radhe me statusin "pending"
+concurrency: tagging
+on:
+    pull_request:
+        types: [closed]
+        branches:
+            - main
+env:
+    BRANCH_NAME: "main"
+
+jobs:
+    find_comit_with_version:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ env.BRANCH_NAME }}
+                  ssh-key: ${{ secrets.TEST_GITOPS_UPDATE }}
+                  fetch-depth: 0 # fetch all history, including tags
+
+            - name: Get latest version tag
+              id: step1
+              run: |
+                  lastVersionCommit=0
+                  # check if git tag result is not empty string
+                  if [ -n "$(git tag --list "v[0-9]*.[0-9]*.[0-9]*" --merged ${{ env.BRANCH_NAME }})" ]; then
+                    echo "Main branch contains a tag that   matches the pattern.";
+                    # lastVersionTag do jete komiti qe ka tag v0.0.1 psh
+                    lastVersionTag=$(git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*")
+                    lastVersionCommit=$(git rev-list -n 1 $lastVersionTag)
+                    echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_OUTPUTS
+                    echo "Last tag with version is $lastVersionTag"
+                  fi
+                  echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_OUTPUTS
+                  echo "$lastVersionCommit"
+
+            - name: Find commit with tag release
+              id: step2
+              if: ${{ steps.step1.outputs.LAST_VERSION_COMMIT != 0 }}
+              run: |
+                  LAST_RELEASE_COMMIT_ID=0
+                  if [ -n "$(git tag --list "release" --merged ${{ env.BRANCH_NAME }})" ]; then
+                    echo "release exists on ${{ env.BRANCH_NAME }}"
+                    LAST_RELEASE_COMMIT_ID=$(git rev-list -n 1 release)
+                  fi
+                  echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_OUTPUTS
+                  echo "LAST_RELEASE_COMMIT_ID is $LAST_RELEASE_COMMIT_ID"
+
+            - name: Determine next old-release index
+              id: step3
+              if: ${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID != 0 }}
+              run: |
+                  prereleaseIndex=$(git tag --sort=-version:refname | grep -E '^old-release.([0-9]+)' | head -n1 | awk -F'.' '{print $2+1}')
+                  if [ -z "$prereleaseIndex" ]; then
+                    prereleaseIndex=1
+                  fi
+                  echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_OUTPUTS
+                  echo "NEXT_PRERELEASE_INDEX is $prereleaseIndex"
+
+            - name: Adding tags release and old-release
+              id: step4
+              if: ${{ steps.step1.outputs.LAST_VERSION_COMMIT != 0 }}
+              run: |
+                  git config --global user.email "bardhylbegolli@gmail.com"
+                  git config --global user.name "BardhylGit"
+
+                  # vetem ne rastin kur kemi pasur nje here tag release
+                  if [ "${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID }}" != 0]; then
+
+                    # shto tag old-release tek comit ku ishte tag release, dhe shtoje ne origine
+                    prereleaseTag=old-release.${{ steps.step3.outputs.NEXT_PRERELEASE_INDEX }}
+                    git tag -a $prereleaseTag -m "New Tag number $prereleaseTag" ${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID }}
+                    git push origin $prereleaseTag
+
+                    # tagun release fshije lokalisht dhe ne origjine
+                    git tag -d release
+                    # git push --delete origin release
+                    # kjo metode eshte me e sigurte sepse sigurohemi qe po fshijme nje tag
+                    git push origin :refs/tags/release
+
+                  fi
+
+                  # shto tagun release tek komiti me tagun e verionuar dhe push ne origjine
+                  git tag release ${{ steps.step1.outputs.LAST_VERSION_COMMIT }}
+                  git push origin release
