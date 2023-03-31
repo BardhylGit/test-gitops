@@ -37,4 +37,11 @@ jobs:
       id: step2
       run: |
         echo " test var is ${{ steps.step1.outputs.testVar }}"
-
+  job2:
+    needs: greet
+    runs-on: ubuntu-latest
+    steps:
+    - name: step1
+      id: step1
+      run: |
+        echo "output testVar is ${{ needs.greet.outputs.testVar }}"
