@@ -37,8 +37,11 @@ jobs:
       id: step2
       run: |
         echo " test var is ${{ steps.step1.outputs.testVar }}"
+    outputs:
+      testVar: ${{ steps.step1.outputs.testVar }}
   job2:
     needs: greet
+    if: needs.greet.outputs.testVar != 0
     runs-on: ubuntu-latest
     steps:
     - name: step1
