@@ -70,20 +70,22 @@ jobs:
                   git config --global user.name "BardhylGit"
 
                   # vetem ne rastin kur kemi pasur nje here tag release
-                  if [ "${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID }}" != 0]; then
+                  if [ "${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID }}" != 0 ]; then
 
                     # shto tag old-release tek comit ku ishte tag release, dhe shtoje ne origine
                     prereleaseTag=old-release.${{ steps.step3.outputs.NEXT_PRERELEASE_INDEX }}
                     git tag -a $prereleaseTag -m "New Tag number $prereleaseTag" ${{ steps.step2.outputs.LAST_RELEASE_COMMIT_ID }}
                     git push origin $prereleaseTag
 
-                    # tagun release fshije lokalisht dhe ne origjine
-                    git tag -d release
-                    # git push --delete origin release
-                    # kjo metode eshte me e sigurte sepse sigurohemi qe po fshijme nje tag
-                    git push origin :refs/tags/release
 
                   fi
+
+                  # tagun release fshije lokalisht dhe ne origjine
+                  git tag -d release
+                  
+                  # git push --delete origin release
+                  # kjo metode eshte me e sigurte sepse sigurohemi qe po fshijme nje tag
+                  git push origin :refs/tags/release
 
                   # shto tagun release tek komiti me tagun e verionuar dhe push ne origjine
                   git tag release ${{ steps.step1.outputs.LAST_VERSION_COMMIT }}
