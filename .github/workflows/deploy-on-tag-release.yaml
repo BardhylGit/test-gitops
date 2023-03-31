@@ -37,7 +37,7 @@ jobs:
                   fi
                   echo "$tagVersion"
                   echo "tagVersion=${tagVersion//v/}" >> $GITHUB_ENV
-          outputs:
+        outputs:
             tagVersion: ${{ env.tagVersion }}
     use-tag:
         needs: find-tag
