@@ -1,4 +1,4 @@
-name: Pre-release Tagging Workflow
+name: Tagging Workflow
 
 # kjo do na siguroje qe vetem 1 workflow e ketij tipi "tagging" do ekzekutohet ne nje kohe.
 # workflow-t e reja qe kane kete emertim "tagging" do vendosen ne radhe me statusin "pending"
@@ -33,10 +33,10 @@ jobs:
                     # lastVersionTag do jete komiti qe ka tag v0.0.1 psh
                     lastVersionTag=$(git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=0 --exclude "*-*")
                     lastVersionCommit=$(git rev-list -n 1 $lastVersionTag)
-                    echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_OUTPUTS
+                    echo "LAST_VERSION_TAG=$lastVersionTag" >> $GITHUB_OUTPUT
                     echo "Last tag with version is $lastVersionTag"
                   fi
-                  echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_OUTPUTS
+                  echo "LAST_VERSION_COMMIT=$lastVersionCommit" >> $GITHUB_OUTPUT
                   echo "$lastVersionCommit"
 
             - name: Find commit with tag release
@@ -48,7 +48,7 @@ jobs:
                     echo "release exists on ${{ env.BRANCH_NAME }}"
                     LAST_RELEASE_COMMIT_ID=$(git rev-list -n 1 release)
                   fi
-                  echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_OUTPUTS
+                  echo "LAST_RELEASE_COMMIT_ID=$LAST_RELEASE_COMMIT_ID" >> $GITHUB_OUTPUT
                   echo "LAST_RELEASE_COMMIT_ID is $LAST_RELEASE_COMMIT_ID"
 
             - name: Determine next old-release index
@@ -59,7 +59,7 @@ jobs:
                   if [ -z "$prereleaseIndex" ]; then
                     prereleaseIndex=1
                   fi
-                  echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_OUTPUTS
+                  echo "NEXT_PRERELEASE_INDEX=$prereleaseIndex" >> $GITHUB_OUTPUT
                   echo "NEXT_PRERELEASE_INDEX is $prereleaseIndex"
 
             - name: Adding tags release and old-release
