@@ -27,14 +27,14 @@ jobs:
     steps:
     # Runs a single command using the runners shell
     - name: Send greeting
-      env:
-        testVar: 1
+      id: step1
       run: |
+        echo "testVar=23" >> $GITHUB_OUTPUT
+        echo "ref eshte ${{ github.ref }}"
+        echo "Hello ${{ github.event.inputs.name }}"
         
-        echo "ref eshte ${{ github.ref }}
-        echo "Hello ${{ github.event.inputs.name }}, testVar is ${{ env.testVar }}"
-        echo "testVar=${{ env.testVar }}" >> $GITHUB_ENV
-        
-    # step2
     - name: step 2
-      run: echo "Hello ${{ env.testVar }}"
+      id: step2
+      run: |
+        echo " test var is ${{ steps.step1.outputs.testVar }}"
+
