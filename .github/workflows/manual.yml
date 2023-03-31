@@ -30,7 +30,7 @@ jobs:
       env:
         testVar: 1
       run: |
-        testVar=3
+        ${{ env.testVar=3 }}
         
         echo "Hello ${{ github.event.inputs.name }}, testVar is ${{ env.testVar }}"
         echo "testVar=${{ env.testVar }}" >> $GITHUB_ENV
