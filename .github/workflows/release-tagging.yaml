@@ -12,7 +12,7 @@ env:
     BRANCH_NAME: "main"
 
 jobs:
-    find_comit_with_version:
+    update_release_tags:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == true
         steps:
