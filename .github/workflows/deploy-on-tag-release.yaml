@@ -8,13 +8,40 @@ concurrency: deploying
 on:
     push:
         tags:
-            - "release"
+            - "release.[0-9]+"
     workflow_dispatch:
 
 env:
     BRANCH_NAME: main
 
 jobs:
+    set_variables:
+        runs-on: ubuntu-latest
+        outputs:
+            TAG_LABEL: ${{ steps.setvars.outputs.TAG_LABEL }}
+            GITOPS_ENV_PATH: ${{ steps.setvars.outputs.GITOPS_ENV_PATH }}
+            BRANCH_NAME: ${{ steps.setvars.outputs.BRANCH_NAME }}
+        steps:
+            - name: Set Variables
+              id: setvars
+              run: |
+                  refName=$(${{github.ref_name}} | grep -E '^(${{ needs.set_variables.outputs.TAG_LABEL }}).[0-9]+' | head -n1 | awk -F'.' '{print $1}')
+                  echo "refname is $refName";
+                  if [ -n "${{github.ref_name}}"]; then
+
+                      if [ "${{github.ref_name}}" == "release" ]; then
+                        echo "TAG_LABEL=release" >> $GITHUB_OUTPUT
+                        echo "GITOPS_ENV_PATH=manifests/environments/production/" >> $GITHUB_OUTPUT
+                        echo "BRANCH_NAME=main" >> $GITHUB_OUTPUT
+                      fi
+
+                      if [ "${{github.ref_name}}" == "stage"]; then
+                        echo "TAG_LABEL=stage" >> $GITHUB_OUTPUT
+                        echo "GITOPS_ENV_PATH=manifests/environments/staging/" >> $GITHUB_OUTPUT
+                        echo "BRANCH_NAME=staging" >> $GITHUB_OUTPUT
+                      fi
+                  fi
+
     find_tag:
         runs-on: ubuntu-latest
         steps:
