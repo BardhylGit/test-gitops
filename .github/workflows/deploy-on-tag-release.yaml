@@ -28,7 +28,7 @@ jobs:
               run: |
                   refName=$(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+')
                   echo "refname is $refName";
-                  if [ -n $(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+') ]; then
+                  if [ -n "$(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+')" ]; then
 
                     echo "TAG_LABEL=release" >> $GITHUB_OUTPUT
                     echo "GITOPS_ENV_PATH=manifests/environments/production/" >> $GITHUB_OUTPUT
@@ -36,7 +36,7 @@ jobs:
                       
                   fi
 
-                  if [ -n $(echo "${{github.ref_name}}" | grep -E '^stage.[0-9]+') ]; then
+                  if [ -n "$(echo "${{github.ref_name}}" | grep -E '^stage.[0-9]+')" ]; then
                     echo "TAG_LABEL=stage" >> $GITHUB_OUTPUT
                     echo "GITOPS_ENV_PATH=manifests/environments/staging/" >> $GITHUB_OUTPUT
                     echo "BRANCH_NAME=staging" >> $GITHUB_OUTPUT
