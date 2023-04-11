@@ -9,6 +9,7 @@ on:
     push:
         tags:
             - "release.[0-9]+"
+            - "stage.[0-9]+"
     workflow_dispatch:
 
 env:
@@ -25,21 +26,20 @@ jobs:
             - name: Set Variables
               id: setvars
               run: |
-                  refName=$(${{github.ref_name}} | grep -E '^(${{ needs.set_variables.outputs.TAG_LABEL }}).[0-9]+' | head -n1 | awk -F'.' '{print $1}')
+                  refName=$(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+')
                   echo "refname is $refName";
-                  if [ -n "${{github.ref_name}}"]; then
+                  if [ -n $(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+') ]; then
 
-                      if [ "${{github.ref_name}}" == "release" ]; then
-                        echo "TAG_LABEL=release" >> $GITHUB_OUTPUT
-                        echo "GITOPS_ENV_PATH=manifests/environments/production/" >> $GITHUB_OUTPUT
-                        echo "BRANCH_NAME=main" >> $GITHUB_OUTPUT
-                      fi
+                    echo "TAG_LABEL=release" >> $GITHUB_OUTPUT
+                    echo "GITOPS_ENV_PATH=manifests/environments/production/" >> $GITHUB_OUTPUT
+                    echo "BRANCH_NAME=main" >> $GITHUB_OUTPUT
+                      
+                  fi
 
-                      if [ "${{github.ref_name}}" == "stage"]; then
-                        echo "TAG_LABEL=stage" >> $GITHUB_OUTPUT
-                        echo "GITOPS_ENV_PATH=manifests/environments/staging/" >> $GITHUB_OUTPUT
-                        echo "BRANCH_NAME=staging" >> $GITHUB_OUTPUT
-                      fi
+                  if [ -n $(echo "${{github.ref_name}}" | grep -E '^stage.[0-9]+') ]; then
+                    echo "TAG_LABEL=stage" >> $GITHUB_OUTPUT
+                    echo "GITOPS_ENV_PATH=manifests/environments/staging/" >> $GITHUB_OUTPUT
+                    echo "BRANCH_NAME=staging" >> $GITHUB_OUTPUT
                   fi
 
     find_tag:
