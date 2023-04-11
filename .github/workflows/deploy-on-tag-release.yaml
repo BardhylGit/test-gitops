@@ -27,7 +27,7 @@ jobs:
               id: setvars
               run: |
                   refName=$(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+')
-                  echo "refname is $refName";
+                  echo "refname is $refName"
                   if [ -n "$(echo "${{github.ref_name}}" | grep -E '^release.[0-9]+')" ]; then
 
                     echo "TAG_LABEL=release" >> $GITHUB_OUTPUT
